@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/farhodm/alif-test/internal/helpers"
 	"github.com/farhodm/alif-test/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -144,14 +143,4 @@ func getMaxBalance(accountType string) float64 {
 		return 10000.00
 	}
 	return 100000.00
-}
-
-func (h *Handler) Info(ctx *gin.Context) {
-	body, err := ctx.GetRawData()
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	digest := helpers.GenerateHmacSha1(body, "qwerty")
-	ctx.Header("X-Digest", digest)
 }
