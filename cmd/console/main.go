@@ -3,9 +3,11 @@ package main
 import (
 	"github.com/farhodm/ewallet/internal/database"
 	"github.com/farhodm/ewallet/internal/models"
+	"github.com/go-faker/faker/v4"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"math/rand"
 )
 
 func main() {
@@ -28,51 +30,34 @@ func main() {
 	); err != nil {
 		log.Fatalln("cannot re-migrate the DB:", err)
 	}
+	for i := 0; i <= 10; i++ {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), 12)
+		if err != nil {
+			log.Fatalln("cannot generate password hash:", err)
+		}
 
-	//creating default user
-	// phone: +992111222333
-	// password: qwerty
-	user1 := models.User{
-		Name:  "Vali",
-		Phone: "+992111222333",
-	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("qwerty"), 12)
-	if err != nil {
-		log.Fatalln("cannot generate password hash:", err)
-	}
-	user1.Password = string(hashedPassword)
-	if err := db.Create(&user1).Error; err != nil {
-		log.Fatalln("cannot create default user:", err)
-	}
-	//creating default user
-	// phone: +992111444888
-	// password: password
-	user2 := models.User{
-		Name:  "Ali",
-		Phone: "+992111444888",
-	}
-	hashedPassword, err = bcrypt.GenerateFromPassword([]byte("password"), 12)
-	if err != nil {
-		log.Fatalln("cannot generate password hash:", err)
-	}
-	user2.Password = string(hashedPassword)
-	if err := db.Create(&user2).Error; err != nil {
-		log.Fatalln("cannot create default user:", err)
-	}
+		user := models.User{
+			Name:     faker.FirstName(),
+			Phone:    faker.Phonenumber(),
+			Password: string(hashedPassword),
+			Wallet:   &models.Wallet{},
+		}
 
-	wallet1 := models.Wallet{
-		UserID: user1.ID,
-	}
-	if err := db.Create(&wallet1).Error; err != nil {
-		log.Fatalln("cannot create wallet:", err)
-	}
-	wallet2 := models.Wallet{
-		UserID: user2.ID,
-		Type:   "identified",
-	}
-	if err := db.Create(&wallet2).Error; err != nil {
-		log.Fatalln("cannot create wallet:", err)
-	}
+		if rand.Int()%2 == 0 {
+			user.Wallet.Type = "identified"
+		} else {
+			user.Wallet.Type = "non-identified"
+		}
 
+		if user.Wallet.Type == "identified" {
+			user.Wallet.Balance = uint64(rand.Intn(100_000_00))
+		} else {
+			user.Wallet.Balance = uint64(rand.Intn(10_000_00))
+		}
+
+		if err := db.Create(&user).Error; err != nil {
+			log.Fatalln("cannot create user:", err)
+		}
+	}
 	log.Println("Successfully!")
 }
