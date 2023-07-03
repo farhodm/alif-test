@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/farhodm/alif-test/internal/database"
-	"github.com/farhodm/alif-test/internal/models"
+	"github.com/farhodm/ewallet/internal/database"
+	"github.com/farhodm/ewallet/internal/models"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"log"

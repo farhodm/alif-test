@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/farhodm/alif-test/internal/models"
+	"github.com/farhodm/ewallet/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"log"
@@ -10,22 +10,9 @@ import (
 	"time"
 )
 
-type UserData struct {
-	ID uuid.UUID `json:"id" binding:"required"`
-}
-
 func (h *Handler) CheckExistingWallet(ctx *gin.Context) {
-	var data UserData
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		log.Println("cannot parse data:", err)
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", data.ID).First(&wallet).Error
+	err := h.DB.Where("user_id =?", ctx.Param("userID")).First(&wallet).Error
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return
@@ -35,7 +22,7 @@ func (h *Handler) CheckExistingWallet(ctx *gin.Context) {
 
 type Replenish struct {
 	UserID uuid.UUID `json:"id" binding:"required"`
-	Amount float64   `json:"amount" binding:"required"`
+	Amount uint64    `json:"amount" binding:"required"`
 }
 
 func (h *Handler) ReplenishWallet(ctx *gin.Context) {
@@ -85,16 +72,8 @@ func (h *Handler) ReplenishWallet(ctx *gin.Context) {
 }
 
 func (h *Handler) GetTransactions(ctx *gin.Context) {
-	var data UserData
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		log.Println("cannot parse data:", err)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": err,
-		})
-		return
-	}
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", data.ID).Preload("Transactions").First(&wallet).Error
+	err := h.DB.Where("user_id =?", ctx.Param("userID")).Preload("Transactions").First(&wallet).Error
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return
@@ -105,7 +84,7 @@ func (h *Handler) GetTransactions(ctx *gin.Context) {
 	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
 
 	var totalTransactions int64
-	var totalAmounts float64
+	var totalAmounts uint64
 
 	err = h.DB.Model(&models.Transaction{}).
 		Where("wallet_id =? and created_at >=? and created_at <=?", wallet.ID, firstOfMonth, time.Now()).Count(&totalTransactions).
@@ -120,16 +99,8 @@ func (h *Handler) GetTransactions(ctx *gin.Context) {
 }
 
 func (h *Handler) GetBalanceWallet(ctx *gin.Context) {
-	var data UserData
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		log.Println("cannot parse data:", err)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": err,
-		})
-		return
-	}
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", data.ID).First(&wallet).Error
+	err := h.DB.Where("user_id =?", ctx.Param("userID")).First(&wallet).Error
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return
@@ -138,9 +109,9 @@ func (h *Handler) GetBalanceWallet(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"balance": fmt.Sprintf("%.2f", wallet.Balance)})
 }
 
-func getMaxBalance(accountType string) float64 {
-	if accountType == "non-identified" {
-		return 10000.00
+func getMaxBalance(accountType string) uint64 {
+	if accountType == "identified" {
+		return 100_000_000
 	}
-	return 100000.00
+	return 10_000_00
 }

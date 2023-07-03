@@ -1,4 +1,4 @@
-module github.com/farhodm/alif-test
+module github.com/farhodm/ewallet
 
 go 1.20
 

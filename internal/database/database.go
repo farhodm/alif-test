@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"github.com/farhodm/alif-test/internal/models"
+	"github.com/farhodm/ewallet/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"os"

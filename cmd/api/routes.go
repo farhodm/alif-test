@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/farhodm/alif-test/internal/handlers"
+	"github.com/farhodm/ewallet/internal/handlers"
+	"github.com/farhodm/ewallet/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -19,13 +20,13 @@ func routes(db *gorm.DB) *gin.Engine {
 		return
 	})
 
-	//router.Use(middleware.Authenticate())
+	router.Use(middleware.AuthMiddleware(db))
 	wallet := router.Group("/wallet")
 	{
-		wallet.GET("/check", h.CheckExistingWallet)
-		wallet.GET("/replenish", h.ReplenishWallet)
-		wallet.GET("/transactions", h.GetTransactions)
-		wallet.GET("/balance", h.GetBalanceWallet)
+		wallet.GET("/:userID/check", h.CheckExistingWallet)
+		wallet.POST("/replenish", h.ReplenishWallet)
+		wallet.GET("/:userID/transactions", h.GetTransactions)
+		wallet.GET("/:userID/balance", h.GetBalanceWallet)
 	}
 	return router
 }

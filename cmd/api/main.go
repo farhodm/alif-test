@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/farhodm/alif-test/internal/database"
+	"github.com/farhodm/ewallet/internal/database"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
