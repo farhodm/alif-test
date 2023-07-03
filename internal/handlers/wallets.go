@@ -21,7 +21,7 @@ func (h *Handler) CheckExistingWallet(ctx *gin.Context) {
 }
 
 type Replenish struct {
-	UserID uuid.UUID `json:"id" binding:"required"`
+	UserID uuid.UUID `json:"user_id" binding:"required"`
 	Amount uint64    `json:"amount" binding:"required"`
 }
 
@@ -106,7 +106,7 @@ func (h *Handler) GetBalanceWallet(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"balance": fmt.Sprintf("%.2f", wallet.Balance)})
+	ctx.JSON(http.StatusOK, gin.H{"balance": fmt.Sprint(wallet.Balance)})
 }
 
 func getMaxBalance(accountType string) uint64 {
