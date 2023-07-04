@@ -15,7 +15,7 @@ sudo -u postgres psql
 # - exit
 go run ./cmd/console
 # Wait until seeding will finish
-# Message "Successfully!" text is okay, it is output of GORM for slow SQL query.
+# Message "Successfully!" text is okay.
 go run ./cmd/api/
 # Go to postman
 ```
