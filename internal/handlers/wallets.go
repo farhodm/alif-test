@@ -12,8 +12,7 @@ import (
 
 func (h *Handler) CheckExistingWallet(ctx *gin.Context) {
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", ctx.Param("userID")).First(&wallet).Error
-	if err != nil {
+	if err := h.DB.Where("user_id =?", ctx.Param("id")).First(&wallet).Error; err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return
 	}
@@ -73,7 +72,7 @@ func (h *Handler) ReplenishWallet(ctx *gin.Context) {
 
 func (h *Handler) GetTransactions(ctx *gin.Context) {
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", ctx.Param("userID")).Preload("Transactions").First(&wallet).Error
+	err := h.DB.Where("user_id =?", ctx.Param("id")).Preload("Transactions").First(&wallet).Error
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return
@@ -100,7 +99,7 @@ func (h *Handler) GetTransactions(ctx *gin.Context) {
 
 func (h *Handler) GetBalanceWallet(ctx *gin.Context) {
 	var wallet models.Wallet
-	err := h.DB.Where("user_id =?", ctx.Param("userID")).First(&wallet).Error
+	err := h.DB.Where("user_id =?", ctx.Param("id")).First(&wallet).Error
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "wallet not found"})
 		return

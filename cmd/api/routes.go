@@ -23,10 +23,10 @@ func routes(db *gorm.DB) *gin.Engine {
 	router.Use(middleware.AuthMiddleware(db))
 	wallet := router.Group("/wallet")
 	{
-		wallet.GET("/:userID/check", h.CheckExistingWallet)
+		wallet.GET("/:id/check", h.CheckExistingWallet)
 		wallet.POST("/replenish", h.ReplenishWallet)
-		wallet.GET("/:userID/transactions", h.GetTransactions)
-		wallet.GET("/:userID/balance", h.GetBalanceWallet)
+		wallet.GET("/:id/transactions", h.GetTransactions)
+		wallet.GET("/:id/balance", h.GetBalanceWallet)
 	}
 	return router
 }
